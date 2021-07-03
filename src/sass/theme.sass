@@ -1,0 +1,30 @@
+@import './sass/color.sass'
+
+@mixin defaultTheme()
+	--color-primary: #{$dodger-blue}
+	// --color-warning: #{}
+	// --color-success: #{}
+	--color-error: #{$milano-red}
+	--color-info: #{$comet}
+	--color-disabled: #{$gray-chateau}
+
+	--color-secondary: #{$persian-green}
+
+	--color-text-primary: #{$white}
+	--color-text-primary-contrast: #{$nepal}
+	--color-text-secondary: #{$blue-haze}
+	--color-text-secondary-contrast: #{$big-stone}
+
+	--color-background-primary: #{$shark}
+	--color-background-secondary: #{$cadet-blue}
+	--color-background-tertiary: #{$oxford-blue}
+	--color-background-primary-contrast: #{$whisper}
+	--color-background-secondary-contrast: #{$mischka}
+	--color-background-primary-gradient: linear-gradient(180deg, #{$dodger-blue} 0%, #{$denim} 100%) 0% 0% no-repeat padding-box
+
+	--color-background-primary-hover: #{$big-stone}
+
+@mixin testTheme()
+	--color-text-primary: red
+	--color-background-tertiary: blue
+	--color-background-secondary: pruple

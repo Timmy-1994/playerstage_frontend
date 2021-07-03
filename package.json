@@ -1,0 +1,93 @@
+{
+  "name": "client",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "react-scripts start --watch",
+    "start:alwaysdata": "dotenv -e .env.alwaysdata react-scripts start --watch",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "lint": "eslint . --fix",
+    "lint-and-fix": "eslint . --fix"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{js,tsx,ts,jsx}": [
+      "eslint --fix"
+    ]
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "dependencies": {
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.5.0",
+    "@testing-library/user-event": "^7.2.1",
+    "@types/jest": "^24.9.1",
+    "@types/node": "^12.20.13",
+    "@types/react": "^16.14.6",
+    "@types/react-copy-to-clipboard": "^4.3.0",
+    "@types/react-dom": "^16.9.13",
+    "@types/react-router-dom": "^5.1.7",
+    "@types/styled-components": "^5.1.9",
+    "antd": "^4.15.5",
+    "axios": "^0.21.1",
+    "blk-design-system-react": "^1.2.0",
+    "bootstrap": "^4.5.3",
+    "dotenv-cli": "^4.1.0",
+    "echarts": "^4.8.0",
+    "moment": "^2.29.1",
+    "node-sass": "^4.14.1",
+    "react": "^16.13.1",
+    "react-copy-to-clipboard": "^5.0.3",
+    "react-dom": "^16.13.1",
+    "react-intl": "^5.17.6",
+    "react-router-dom": "^5.1.2",
+    "react-scripts": "^3.4.4",
+    "react-websocket": "^2.1.0",
+    "reactstrap": "^8.7.1",
+    "reconnecting-websocket": "^4.4.0",
+    "sass-loader": "^8.0.2",
+    "styled-components": "^5.3.0",
+    "tslint": "^6.1.1",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.13.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.14.2",
+    "@babel/preset-typescript": "^7.13.0",
+    "@types/echarts": "^4.9.7",
+    "@types/uuid": "^8.3.0",
+    "@typescript-eslint/eslint-plugin": "^4.23.0",
+    "@typescript-eslint/parser": "^4.23.0",
+    "eslint": "^7.11.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.23.2",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.3.1",
+    "eslint-plugin-react": "^7.23.2",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "husky": "^4.3.8",
+    "lint-staged": "^10.5.4",
+    "typescript": "^4.2.4"
+  }
+}
