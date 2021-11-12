@@ -1,3 +1,7 @@
+![workflow](https://github.com/Timmy-1994/playerstage_frontend/actions/workflows/main.yml/badge.svg?branch=master)
+
+---
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

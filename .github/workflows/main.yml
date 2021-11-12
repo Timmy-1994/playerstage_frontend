@@ -1,0 +1,41 @@
+name: Deploy to AlwaysData
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        node-version: [12.22.0] # [12.x, 14.x, 16.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - run: npm install
+      - run: npm run build:alwaysdata
+
+      - name: Sync files  
+        uses: SamKirkland/FTP-Deploy-Action@4.1.0
+        with:
+          server: ftp-sisyphean.alwaysdata.net
+          username: ${{secrets.FTP_USERNAME}}
+          password: ${{secrets.FTP_PASSWORD}}
+          local-dir: ./build/
+          server-dir: /frontend/
+
+      # see https://help.alwaysdata.com/en/api/usage/
+      - name: restart application
+        run: curl -X POST --basic --user "${{secrets.ALWAYSDATA_ACCESS_TOKEN}}:" https://api.alwaysdata.com/v1/site/672619/restart/
+      
