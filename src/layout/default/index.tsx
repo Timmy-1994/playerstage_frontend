@@ -21,6 +21,7 @@ const LayoutStyled = styled.div`
     background-image: url('${dots}');
     background-size: contain;
     height: 100%;
+    padding-top: 4rem;
     overflow-y: auto;
 `;
 const PanelStyled = styled.div`

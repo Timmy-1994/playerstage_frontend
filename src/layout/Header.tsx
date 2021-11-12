@@ -16,6 +16,7 @@ const NavbarStyled = styled(Navbar)`
     position: absolute;
     background: rgba(0,0,0,${props => props.opacity});
     color: var(--color-text-primary);
+    height: 4rem;
   }
 `;
 const ButtonStyled = styled(Button)`
