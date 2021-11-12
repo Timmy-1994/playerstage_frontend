@@ -2,6 +2,12 @@ import React from 'react';
 import styled from 'styled-components';
 import Loading from 'src/layout/Loading';
 
+import LayoutFooter from 'src/layout/Footer';
+import LayoutHeader from 'src/layout/Header';
+
+import 'blk-design-system-react/src/assets/scss/blk-design-system-react.scss';
+import dots from 'blk-design-system-react/src/assets/img/dots.png';
+
 const Wrapper = styled.div`
     position: relative;
     height: 100%;
@@ -11,13 +17,14 @@ const Wrapper = styled.div`
 `;
 const LayoutStyled = styled.div`
     display: flex;
-    background-color: #21242C;
+    background-color: var(--color-background-primary);
+    background-image: url('${dots}');
+    background-size: contain;
     height: 100%;
     overflow-y: auto;
 `;
 const PanelStyled = styled.div`
     flex: 0 0 414px;
-    background-color: #303545;
     overflow-y: auto;
 `;
 const Container = styled.div`
@@ -25,9 +32,6 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-`;
-const ContentStyled = styled.div`
-    flex: 5;
 `;
 const FooterStyled = styled.div`
     background-color: #2C303B;
@@ -50,19 +54,26 @@ const Layout = (props:{children: React.ReactElement|React.ReactElement[] }) => {
     return (
         <Wrapper>
             <Loading />
-            {
-                (panel && content)
-                    ?
-                    <LayoutStyled>
+            <LayoutHeader/>
+            <LayoutStyled>
+                {
+                    panel
+                        ?
                         <PanelStyled>{panel.props.children}</PanelStyled>
-                        <Container>
-                            <ContentStyled>{content.props.children}</ContentStyled>
-                            {footer && <FooterStyled>{footer.props.children}</FooterStyled>}
-                        </Container>
-                    </LayoutStyled>
-                    :
-                    props.children
-            }
+                        :
+                        null
+                }
+                <Container>
+                    <div>{content?.props.children}</div>
+                    {
+                        footer
+                            ?
+                            <FooterStyled>{footer.props.children}</FooterStyled>
+                            :
+                            <LayoutFooter/>
+                    }
+                </Container>
+            </LayoutStyled>
         </Wrapper>
     );
 };
