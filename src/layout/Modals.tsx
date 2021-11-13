@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
-import { WarningOutlined } from '@ant-design/icons';
+import { WarningOutlined,
+    InfoCircleOutlined,
+    CheckCircleOutlined,
+    QuestionCircleOutlined
+} from '@ant-design/icons';
 import { ModalFuncProps } from 'antd/lib/modal';
 import modal from 'antd/lib/modal';
 import { Prompt, useHistory } from 'react-router-dom';
@@ -16,14 +20,14 @@ const RoutePrompt = (props: { when: boolean }) => {
         setIsShowPrompt(when);
     }, [when]);
     const [nextLocation, setNextLocation] = useState<string>('');
-    
+
     useEffect(() => {
         if (nextLocation) {
             history.push(nextLocation);
         }
     }, [nextLocation]);
 
-    return <Prompt 
+    return <Prompt
         message={(loc) => {
             Modal.confirm({
                 title: '確定要離開？',
@@ -33,18 +37,23 @@ const RoutePrompt = (props: { when: boolean }) => {
                 }
             });
             return false;
-        }} 
-        when={isShowPrompt} 
+        }}
+        when={isShowPrompt}
     />;
 };
 
 const Footer = styled.div`
-    margin-top: 2rem;
-    display: flex; 
-    justify-content: flex-end;
+    & {
+        margin-top: 2rem;
+        display: flex;
+        justify-content: flex-end;
+        >* {
+            margin-left: 1rem;
+        }
+    }
 `;
 
-const Style = createGlobalStyle`
+const GlobalStyle = createGlobalStyle<{color:string}>`
     .ant-modal {
         .ant-modal-confirm-btns {
             display: none;
@@ -52,16 +61,16 @@ const Style = createGlobalStyle`
         .ant-modal-confirm-title{
             font-weight: normal;
             font-size: 1rem;
-            color:var(--color-info);
+            color:var(--color-${props => props.color});
         }
         .ant-modal-confirm-content{
             margin: 1rem 0;
             white-space: pre-wrap;
-            color:var(--color-error);
+            color:var(--color-${props => props.color});
         }
         .anticon{
             * {
-                color: var(--color-error);
+                color: var(--color-${props => props.color});
             }
             font-size: 2rem;
         }
@@ -69,8 +78,8 @@ const Style = createGlobalStyle`
 `;
 
 const directModal = (
-    props: ModalFuncProps, 
-    type:'info'|'success'|'error'|'warning'|'confirm' 
+    props: ModalFuncProps,
+    type:'info'|'success'|'error'|'warning'|'confirm'
 ) => {
 
     const {
@@ -80,25 +89,30 @@ const directModal = (
 
     // const typesStyle = {}
 
+    const typeIcon = {
+        info: <InfoCircleOutlined />,
+        success: <CheckCircleOutlined />,
+        error: <WarningOutlined/>,
+        warning: <WarningOutlined/>,
+        confirm: <QuestionCircleOutlined />
+    };
+
     const config = {
-        ...props,
-        icon: <WarningOutlined/>,
+        icon: typeIcon[type],
         style: {top: '35%'},
+        ...props,
         content: <>
-            <Style/>
-            {props.content}
+            <GlobalStyle color={type === 'confirm' ? 'primary' : type}/>
+            {props.content || 'no message'}
             <Footer>
                 {
-                    (type === 'confirm') && <Button 
-                        className='info ghost'
+                    (type === 'confirm') && <Button
                         onClick={() => {
                             _modal.destroy();
                         }}
                     >{cancelText}</Button>
                 }
-                <Button 
-                    style={{marginLeft: '1rem'}}
-                    className='primary-gradient' 
+                <Button
                     onClick={() => {
                         props.onOk && props.onOk();
                         _modal.destroy();
