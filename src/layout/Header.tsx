@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 // reactstrap components
 import {
     NavbarBrand,
@@ -10,6 +10,8 @@ import styled from 'styled-components';
 import logo from 'src/assets/logo.png';
 
 import { Button, Menu, Dropdown, Badge, Avatar, Space, Divider } from 'antd';
+import { useStore as useGlobalStore } from 'src/contexts/globalContext';
+import { logout } from 'src/api';
 
 const NavbarStyled = styled(Navbar)`  
   & {
@@ -26,13 +28,8 @@ const ButtonStyled = styled(Button)`
 `;
 export default function Header() {
 
-    const usermenu = (
-        <Menu>
-            <Menu.Item key="1">manage 1</Menu.Item>
-            <Menu.Item key="2">manage 2</Menu.Item>
-            <Menu.Item key="3">manage 3</Menu.Item>
-        </Menu>
-    );
+    const history = useHistory();
+    const {userInfo} = useGlobalStore();
 
     return (
         <NavbarStyled opacity={0.5}>
@@ -51,13 +48,33 @@ export default function Header() {
                         </ButtonStyled>
                     </Badge>
 
-                    <Dropdown overlay={usermenu}>
-                        <Space>
-              Hi , Player
-                            <Avatar size="small" icon={<i className="fa fa-user" />} />
-                        </Space>
-                    </Dropdown>
-
+                    {
+                        userInfo 
+                            ? 
+                            <Dropdown
+                                overlay={
+                                    <Menu>
+                                        <Menu.Item 
+                                            key="dashboard"
+                                            onClick={() => history.push('/dashboard')}
+                                        >dashboard</Menu.Item>
+                                        <Menu.Item 
+                                            key="logout" 
+                                            onClick={() => logout(userInfo.uuid)}
+                                        >logout</Menu.Item>
+                                    </Menu>
+                                }
+                            >
+                                <Space>
+                                Hi , {userInfo.username}
+                                    <Avatar size="small" icon={<i className="fa fa-user" />} />
+                                </Space>
+                            </Dropdown>
+                            :
+                            <ButtonStyled type='link' onClick={() => history.push('/signin')}>
+                            Sign In
+                            </ButtonStyled> 
+                    }
           
                 </Space>
 

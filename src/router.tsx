@@ -1,7 +1,9 @@
 import React from 'react';
-import { BrowserRouter, Redirect, Route, RouteProps, Switch, useLocation } from 'react-router-dom';
-import Login from 'src/page/Login';
+import { BrowserRouter, Route, RouteProps, Switch, useHistory, useLocation } from 'react-router-dom';
+import Signin from 'src/page/Signin';
+import Signup from 'src/page/Signup';
 import Landing from 'src/page/Landing';
+import { useStore as useGlobalStore } from 'src/contexts/globalContext';
 
 export interface IRouterConfig extends RouteProps {
 	component?:React.ComponentType<any>,
@@ -9,12 +11,22 @@ export interface IRouterConfig extends RouteProps {
 }
 export const GuardedRoute = (props:RouteProps) => {
     const location = useLocation();
-	
+    const {setUserInfo} = useGlobalStore();
+    const history = useHistory();
+
     console.log('[ GuardedRoute - props ]', props);
 
-    // if(location.pathname === '/') {
-    //     return <Redirect to='/login'/>;
-    // }
+    React.useEffect(() => {
+
+        const userInfo = localStorage.getItem('userInfo') || undefined;   
+        setUserInfo(userInfo && JSON.parse(userInfo as string));
+
+        // hasLogin -> redirect
+        if(location.pathname === '/signin' && userInfo) {
+            history.push('/');
+        }
+
+    }, []);
 
     return <Route {...props}/>;
 };
@@ -31,7 +43,7 @@ export const GuardedRoutes = (props:{config:IRouterConfig[]}) => (
                 ))
             }
         </Switch>
-    </BrowserRouter> 
+    </BrowserRouter>
 );
 
 export const routerConfig:Array<IRouterConfig> = [
@@ -41,11 +53,16 @@ export const routerConfig:Array<IRouterConfig> = [
         component: Landing
     },
     {
-        path: '/login',
+        path: '/signin',
         exact: true,
-        component: Login
+        component: Signin
     },
     {
-        render: (routeProps) => <p>{String(routeProps)} : 404</p>
+        path: '/signup',
+        exact: true,
+        component: Signup
+    },
+    {
+        render: (routeProps) => <p style={{color: 'red'}}>{JSON.stringify(routeProps)} : 404</p>
     }
 ];

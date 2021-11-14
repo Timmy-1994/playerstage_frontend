@@ -53,9 +53,17 @@ responseInterceptorsIns.use();
 
 export const signup = (payload:apiType.ISignupRequest) => axiosIns.post<apiType.ISignupResponse>('/auth/signup', payload);
 
-export const signin = (payload:apiType.ISigninRequest) => axiosIns.post<apiType.ISigninResponse>('/auth/signin', payload);
+export const signin = async (payload:apiType.ISigninRequest) => {
+    const res = await axiosIns.post<apiType.ISigninResponse>('/auth/signin', payload);   
+    localStorage.setItem('userInfo', JSON.stringify(res.data));
+    return res;
+};
 
-export const logout = (userUUID:string) => axiosIns.delete<void>(`/auth/logout?userid=${userUUID}`);
+export const logout = async (userUUID:string) => {
+    axiosIns.delete<void>(`/auth/logout?userid=${userUUID}`);
+    localStorage.removeItem('userInfo');
+    window.location.reload();
+};
 
 export const product = {
     get: () => axiosIns.get<apiType.ISigninResponse>('/products')
