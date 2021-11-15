@@ -1,6 +1,9 @@
+@import 'blk-design-system-react/src/assets/scss/blk-design-system-react'
 @import './sass/theme.sass'
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC&family=Play&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC&display=swap')
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC&family=Play&display=swap')
+/* @see https://github.com/angular/angular-cli/issues/5312 */
+@import '~antd/dist/antd'
 
 \:root
 	@include defaultTheme
@@ -26,3 +29,20 @@ svg
 
 #root
 	height: 100%
+
+// antd overrides
+
+.ant-tooltip
+	.ant-tooltip-content
+		color: var(--color-text-primary)
+
+	.ant-tooltip-inner,.ant-tooltip-arrow-content
+		background: red
+
+.ant-select-dropdown
+	.ant-select-item-option-active:not(.ant-select-item-option-disabled)
+		background: #D1ECFF
+
+.ant-modal
+	.ant-modal-content
+		border-radius: .5rem

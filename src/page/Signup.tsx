@@ -17,6 +17,7 @@ import { Form, FormItemProps } from 'antd';
 import { useStore } from 'src/contexts/globalContext';
 import { signup } from 'src/api';
 import { useHistory } from 'react-router';
+import { blkAssets } from 'src/assets';
 
 const ContainerStyled = styled(Container)`
     padding-top:5rem;
@@ -153,7 +154,7 @@ export default function Signup() {
                     <Card className="card-register">
                         <CardHeader>
                             <CardImg
-                                src={require('blk-design-system-react/src/assets/img/square1.png')}
+                                src={blkAssets.square1}
                             />
                             <CardTitleStyled tag="h4">SignUp</CardTitleStyled>
                         </CardHeader>

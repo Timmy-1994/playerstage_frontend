@@ -4,9 +4,7 @@ import Loading from 'src/layout/Loading';
 
 import LayoutFooter from 'src/layout/Footer';
 import LayoutHeader from 'src/layout/Header';
-
-import 'blk-design-system-react/src/assets/scss/blk-design-system-react.scss';
-import dots from 'blk-design-system-react/src/assets/img/dots.png';
+import {blkAssets} from 'src/assets';
 
 const Wrapper = styled.div`
     position: relative;
@@ -18,7 +16,7 @@ const Wrapper = styled.div`
 const LayoutStyled = styled.div`
     display: flex;
     background-color: var(--color-background-primary);
-    background-image: url('${dots}');
+    background-image: url('${blkAssets.dots}');
     background-size: contain;
     height: 100%;
     padding-top: 4rem;

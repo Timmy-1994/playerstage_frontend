@@ -7,7 +7,7 @@ import {
     Container
 } from 'reactstrap';
 import styled from 'styled-components';
-import logo from 'src/assets/logo.png';
+import {logo} from 'src/assets';
 
 import { Button, Menu, Dropdown, Badge, Avatar, Space, Divider } from 'antd';
 import { useStore as useGlobalStore } from 'src/contexts/globalContext';
