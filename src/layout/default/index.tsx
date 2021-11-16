@@ -30,17 +30,6 @@ const Container = styled.div`
     flex:1;
     display: flex;
     flex-direction: column;
-    &>:first-child{
-        flex-grow: 1;
-    }
-    &>*{
-        z-index: 1;
-    }
-`;
-const FooterStyled = styled.div`
-    background-color: #2C303B;
-    padding: 1.8rem 2.2rem;
-    flex: 1;
 `;
 
 const Panel:React.ComponentType = () => null;
@@ -68,14 +57,16 @@ const Layout = (props:{children: React.ReactElement|React.ReactElement[] }) => {
                         null
                 }
                 <Container>
-                    <div>{content?.props.children}</div>
-                    {
-                        footer
-                            ?
-                            <FooterStyled>{footer.props.children}</FooterStyled>
-                            :
-                            <LayoutFooter/>
-                    }
+                    <div style={{flexGrow: 1}}>{content?.props.children}</div>
+                    <div style={{zIndex: 1}}>
+                        {
+                            footer
+                                ?
+                                footer.props.children
+                                :
+                                <LayoutFooter/>
+                        }
+                    </div>
                 </Container>
             </LayoutStyled>
         </Wrapper>
