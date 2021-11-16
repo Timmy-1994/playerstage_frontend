@@ -46,3 +46,28 @@ export type ISignupResponse = {
     ctime:                 null;
     utime:                 null;
 }
+
+interface IProductModel {
+    uuid:         string;
+    name:         string;
+    price:        number;
+    discount:     number;
+    totalStock:   number;
+    promoteStock: number;
+    imageHash:    string;
+    productsId:   string;
+}
+
+export interface IProductResponse {
+    uuid:        string;
+    coverImage:  string;
+    imgUrl:      string[];
+    models:      IProductModel[];
+    brand:       string;
+    time:        string;
+    description: string;
+    isPreOrder:  boolean;
+    name:        string;
+    rating:      number;
+    sold:        number;
+}

@@ -66,6 +66,6 @@ export const logout = async (userUUID:string) => {
 };
 
 export const product = {
-    get: () => axiosIns.get<apiType.ISigninResponse>('/products')
+    get: (params?:Partial<{page:number, pageSize:number}>) => axiosIns.get<Array<apiType.IProductResponse>>('/products', {params})
     // post:()=>axiosIns.post<apiType.ISigninResponse>("/product")
 };

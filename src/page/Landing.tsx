@@ -1,13 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-// import useAxios from 'src/hooks/useAxios';
-// import { useIntl } from 'react-intl';
 import Layout from 'src/layout/default';
-import { Container } from 'reactstrap';
-import { 
-    // Rate, 
-    Space 
+import * as apiType from 'src/types/api';
+import * as api from 'src/api';
+import {
+    Rate,
+    Card,
+    Empty, 
+    Skeleton
 } from 'antd';
+import { useStore } from 'src/contexts/globalContext';
+import { Button, Container } from 'reactstrap';
 
 const {
     // Panel,
@@ -16,38 +19,14 @@ const {
 } = Layout;
 
 
-const Page = styled.div`
-
-    .content-center {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        z-index: 2;
-        -ms-transform: translate(-50%, -50%);
-        -webkit-transform: translate(-50%, -50%);
-        transform: translate(-50%, -50%);
-        text-align: center;
-        color: var(--color-text-primary);
-        padding: 0 15px;
-        width: 100%;
-        max-width: 880px;
-
-        &.brand {
-            width: 47%;
-            > * {
-                color: var(--color-text-primary);
-            }
-            h1 {
-                font-size: 5em;
-                text-transform: uppercase;
-                font-weight: 300;
-            }
-        }
-    }
+const SqGroup = styled.div`
     & {
-        height: 100vh;
-        overflow: hidden;
-        position: relative;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
 
         .squares{
             animation: move-left-right 1s infinite;
@@ -121,12 +100,119 @@ const Page = styled.div`
         }
     }
 `;
+
+const ContainerStyled = styled(Container)`
+    & {
+        padding-top:3rem;
+        padding-bottom:3rem;
+    }
+`;
+const CardWrapper = styled.div`
+    display:flex;
+    flex-wrap:wrap;
+    gap:1rem;
+    align-items: center;
+    height: 100%;
+    & > * {
+        flex: 0 1 250px;
+        :last-child {
+            flex-grow: 0;
+        }
+    }
+`;
+const CardStyled = styled(Card)`
+    background-color: var(--color-background-secondary-alpha-80);
+    border: none;
+    border-radius: 1rem;
+    color: var(--color-primary);
+    cursor: pointer;
+    overflow: hidden;
+    .ant-card-body {
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+    }
+`;
+
+const RateStyled = styled(Rate)`
+    & {
+        .ant-rate-star {
+            margin:0;
+            transform:scale(0.8);
+        }
+    }
+`;
+
+const ImageStyled = styled.div<{src:string}>`
+    margin: -1rem -1rem 1rem -1rem;
+    width: calc(100% + 2rem);
+    height: 200px;
+    background: url("${props => props.src}");
+    background-size: 150%;
+    background-position: center;
+`;
+
+const getPriceRangeFromProductModel = (models:apiType.IProductResponse['models']) => {
+    const prices = models.map(x => x.price);
+    const [max, min] = [Math.max(...prices), Math.min(...prices)];
+    return `NT ${max === min ? max : `${min}~${max}`}`;
+};
+
 export default function Landing() {
+    const [ productList, setProductList ] = useState<Array<apiType.IProductResponse>>([]);
+    const [ page, setPage ] = useState(0);
+    const [ isOutOfProduct, setIsOutOfProduct ] = useState(false);
+    const [ isScrolledEnd, setIsScrolledEnd ] = useState(false);
+    const { setIsLoading, isLoading } = useStore();
+    
+    const getProductList = async (_page:number = 0) => {
+        try{
+            setIsLoading(true);
+            const {data} = await api.product.get({page: _page});
+            
+            if(!data.length) {
+                setIsOutOfProduct(true);
+                throw('out of data');
+            }
+    
+            setProductList(prv => [...prv, ...data]);
+            setPage(p => p + 1);
+        }catch(e) {
+            console.error('getProductList', e);
+        }finally{
+            setIsLoading(false);
+        } 
+    };
+  
+    const scrollToEndHandler = async (evt:Event) => {
+        // console.log("[scroll evt]", evt)
+        const { scrollTop, clientHeight, scrollHeight, offsetHeight } = evt.target as HTMLDivElement;       
+        // console.log({scrollTop ,clientHeight,scrollHeight, offsetHeight})
+        setIsScrolledEnd(scrollTop + clientHeight >= scrollHeight - offsetHeight);
+    };
+
+
+    React.useEffect(() => {
+        // console.log(" useEffect dep" , {isLoading,page,isScrolledEnd,isOutOfProduct})
+        if(isLoading || isOutOfProduct) {
+            return;
+        }
+        if(page === 0 || isScrolledEnd) {
+            getProductList(page);
+        }
+    }, [page, isScrolledEnd, isLoading, isOutOfProduct]);
+
+    React.useEffect(() => {
+        window.addEventListener('scroll', scrollToEndHandler, true);
+        return () => {
+            window.removeEventListener('scroll', scrollToEndHandler);
+        };
+    }, []);
 
     return (
         <Layout>
             <Content>
-                <Page>
+                <SqGroup>
                     <div className="squares square1" />
                     <div className="squares square2" />
                     <div className="squares square3" />
@@ -134,22 +220,31 @@ export default function Landing() {
                     <div className="squares square5" />
                     <div className="squares square6" />
                     <div className="squares square7" />
-                    <Container>
-                        <div className="content-center brand">
-                            <h1>Comming Soon</h1>
-                            <h3>
-                                Hello World ! We offer the articles according to your own specifications.
-                                You can visite our shopee market first.
-                            </h3>
-                            <Space className='mt-5'>
-                                <a href="https://shopee.tw/az310007">
-                                    <img src="https://cfshopeesg-a.akamaihd.net/file/f0bfbe61296cce0f59ec3d0ca279eeb5"/> 
-                                </a>
-                            </Space>
-                            {/* <Rate allowHalf defaultValue={2.5} />*/}
-                        </div>
-                    </Container>
-                </Page>
+                </SqGroup>
+                <ContainerStyled>
+                    <CardWrapper>
+                        {
+                            productList.map(product =>
+                                <CardStyled key={product.uuid} onClick={() => {
+                                    console.log('driect to detail page');
+                                }}>
+                                    <ImageStyled src={product.coverImage}/>
+                                    <strong>{product.name}</strong>
+                                    <RateStyled disabled allowHalf defaultValue={product.rating}/>
+                                    <big style={{fontWeight: 'bolder', color: 'var(--color-error)', textAlign: 'right'}}>
+                                        {getPriceRangeFromProductModel(product.models)}
+                                    </big>
+                                    <Button size="sm" onClick={e => {
+                                        e.stopPropagation();
+                                        console.log('add to cart');
+                                    }}> Add to cart </Button>
+                                </CardStyled>
+                            )
+                        }
+                        { !productList.length && <Empty style={{color: 'var(--color-text-primary', margin: '0 auto'}}/> }
+                    </CardWrapper>
+                    { isLoading && <Skeleton/> }
+                </ContainerStyled>
             </Content>
         </Layout>
     );

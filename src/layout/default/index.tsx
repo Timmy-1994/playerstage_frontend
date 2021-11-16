@@ -30,7 +30,12 @@ const Container = styled.div`
     flex:1;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
+    &>:first-child{
+        flex-grow: 1;
+    }
+    &>*{
+        z-index: 1;
+    }
 `;
 const FooterStyled = styled.div`
     background-color: #2C303B;
