@@ -9,6 +9,7 @@ import { ModalFuncProps } from 'antd/lib/modal';
 import modal from 'antd/lib/modal';
 import { Prompt, useHistory } from 'react-router-dom';
 import { Button } from 'src/component/styled';
+import { Space } from 'antd';
 
 const RoutePrompt = (props: { when: boolean }) => {
     const { when } = props;
@@ -54,40 +55,33 @@ const Footer = styled.div`
 `;
 
 const GlobalStyle = createGlobalStyle<{color:string}>`
-    .ant-modal {
-        .ant-modal-confirm-btns {
-            display: none;
-        }
-        .ant-modal-confirm-title{
-            font-weight: normal;
-            font-size: 1rem;
-            color:var(--color-${props => props.color});
-        }
-        .ant-modal-confirm-content{
-            margin: 1rem 0;
-            white-space: pre-wrap;
-            color:var(--color-${props => props.color});
-        }
+    .ant-modal-confirm-btns {
+        display: none;
+    }
+
+    .ant-modal-confirm-body {
         .anticon{
             * {
                 color: var(--color-${props => props.color});
             }
             font-size: 2rem;
         }
+        .ant-modal-confirm-content{
+            margin: 1rem 0;
+            white-space: pre-wrap;
+            color:var(--color-${props => props.color});
+        }
     }
 `;
 
-const directModal = (
-    props: ModalFuncProps,
-    type:'info'|'success'|'error'|'warning'|'confirm'
-) => {
+interface directModalProps extends Omit<ModalFuncProps, 'direction'|'type'>{
+    type?:'info'|'success'|'error'|'warning'|'confirm'
+    footer?:React.ReactNode,
+    direction?:'vertical'|'horizontal'
+    duration?:number
+}
 
-    const {
-        okText = 'ok',
-        cancelText = 'cancel'
-    } = props;
-
-    // const typesStyle = {}
+const directModal = (props: directModalProps) => {
 
     const typeIcon = {
         info: <InfoCircleOutlined />,
@@ -97,40 +91,78 @@ const directModal = (
         confirm: <QuestionCircleOutlined />
     };
 
+    const {
+        type = 'confirm',
+        footer = undefined,
+        okText = 'ok',
+        onOk = () => console.error('onOk no op'),
+        cancelText,
+        onCancel = () => console.error('onCancel no op'),
+        content = 'no message',
+        direction = 'horizontal',
+        style = {},
+        duration,
+        ...rest
+    } = props;
+    
+    if(direction === 'vertical') {
+        style.textAlign = 'center';
+    }
+
     const config = {
-        icon: typeIcon[type],
-        style: {top: '35%'},
-        ...props,
+        ...rest,
+        style: {top: '35%', ...style},
+        icon: null,
         content: <>
             <GlobalStyle color={type === 'confirm' ? 'primary' : type}/>
-            {props.content || 'no message'}
-            <Footer>
-                {
-                    (type === 'confirm') && <Button
-                        onClick={() => {
-                            _modal.destroy();
-                        }}
-                    >{cancelText}</Button>
-                }
-                <Button
-                    onClick={() => {
-                        props.onOk && props.onOk();
-                        _modal.destroy();
-                    }}
-                >{okText}</Button>
-            </Footer>
+
+            <Space direction={direction} align={'center'}>
+                {typeIcon[type]}
+                {content}
+            </Space>
+            
+            {
+                footer !== undefined 
+                    ? 
+                    footer 
+                    : 
+                    (
+                        <Footer>
+                            {
+                                cancelText && <Button
+                                    onClick={() => {
+                                        onCancel();
+                                        _modal.destroy();
+                                    }}
+                                >{cancelText}</Button>
+                            }
+                            <Button
+                                onClick={() => {
+                                    onOk();
+                                    _modal.destroy();
+                                }}
+                            >{okText}</Button>
+                        </Footer>
+                    )
+            }
         </>
     };
 
     const _modal = modal[type](config);
+    
+    if(duration !== undefined) {
+        setTimeout(_modal.destroy, duration);
+    }
+
+    return _modal;
 };
 
 const Modal = {
-    info: (props: ModalFuncProps) => directModal(props, 'info'),
-    success: (props: ModalFuncProps) => directModal(props, 'success'),
-    error: (props: ModalFuncProps) => directModal(props, 'error'),
-    warning: (props: ModalFuncProps) => directModal(props, 'warning'),
-    confirm: (props: ModalFuncProps) => directModal(props, 'confirm')
+    info: (props: directModalProps) => directModal({...props, type: 'info'}),
+    success: (props: directModalProps) => directModal({...props, type: 'success'}),
+    error: (props: directModalProps) => directModal({...props, type: 'error'}),
+    warning: (props: directModalProps) => directModal({...props, type: 'warning'}),
+    confirm: (props: directModalProps) => directModal({...props, type: 'confirm'})
 };
 
 export {Modal, RoutePrompt};
