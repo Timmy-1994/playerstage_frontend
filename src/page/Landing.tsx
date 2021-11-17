@@ -12,7 +12,7 @@ import {
     Col,
     Image
 } from 'antd';
-import { useStore } from 'src/contexts/globalContext';
+import { ICartItem, useStore } from 'src/contexts/globalContext';
 import { Button, Container } from 'reactstrap';
 import { Modal } from 'src/layout/Modals';
 import Paragraph from 'antd/lib/typography/Paragraph';
@@ -129,11 +129,20 @@ const RateStyled = styled(Rate)`
     }
 `;
 
-const getPriceRangeFromProductModel = (models:apiType.IProductResponse['models']) => {
+export const getPriceRangeFromModels:(models:apiType.IProductResponse['models'])=>string = models => {
     const prices = models.map(x => x.price);
     const [max, min] = [Math.max(...prices), Math.min(...prices)];
     return `NT ${max === min ? max : `${min}~${max}`}`;
 };
+
+export const buildACartItemFromProduct:(product:apiType.IProductResponse)=>ICartItem = product => ({
+    ...product,
+    selectedModelUUID: product.models[0].uuid,
+    priceRangeOfModels: getPriceRangeFromModels(product.models),
+    noModelsForSelect: product.models.length <= 1, 
+    isChecked: true,
+    amount: 1
+});
 
 export default function Landing() {
     const [ productList, setProductList ] = useState<Array<apiType.IProductResponse>>([]);
@@ -190,20 +199,16 @@ export default function Landing() {
     const onAddToCart = (e:React.MouseEvent<HTMLButtonElement, MouseEvent>, {product}:{product:apiType.IProductResponse}) => {
         e.stopPropagation();
         setCart(prvCart => {
-            const exist = prvCart.find(x => x.uuid === product.uuid);
-
-            if(exist) {
-                exist.amount += 1;
+            const ptr = prvCart.find(x => x.uuid === product.uuid);
+        
+            if(ptr) {
+                ptr.amount += 1; //! not sure whether modifying by address is good or not
                 return [...prvCart];
             }
 
             return [
                 ...prvCart,
-                {
-                    ...product,
-                    priceRange: getPriceRangeFromProductModel(product.models),
-                    amount: 1
-                }
+                buildACartItemFromProduct(product)
             ];
         });
 
@@ -243,7 +248,7 @@ export default function Landing() {
             </Paragraph>
             <RateStyled disabled allowHalf defaultValue={product.rating}/>
             <big style={{fontWeight: 'bolder', color: 'var(--color-error)', textAlign: 'right'}}>
-                {getPriceRangeFromProductModel(product.models)}
+                {getPriceRangeFromModels(product.models)}
             </big>
             <Button size="sm" onClick={e => onAddToCart(e, {product})}> Add to cart </Button>
         </CardStyled>

@@ -4,6 +4,7 @@ import Signin from 'src/page/Signin';
 import Signup from 'src/page/Signup';
 import Landing from 'src/page/Landing';
 import { useStore as useGlobalStore } from 'src/contexts/globalContext';
+import Cart from './page/Cart';
 
 export interface IRouterConfig extends RouteProps {
 	component?:React.ComponentType<any>,
@@ -11,15 +12,21 @@ export interface IRouterConfig extends RouteProps {
 }
 export const GuardedRoute = (props:RouteProps) => {
     const location = useLocation();
-    const {setUserInfo} = useGlobalStore();
+    const {setUserInfo, setCart} = useGlobalStore();
     const history = useHistory();
 
     console.log('[ GuardedRoute - props ]', props);
 
     React.useEffect(() => {
-
+        
+        // sync storage to state - user state
         const userInfo = localStorage.getItem('userInfo') || undefined;   
-        setUserInfo(userInfo && JSON.parse(userInfo as string));
+        setUserInfo(userInfo && JSON.parse(userInfo));
+        
+        // sync storage to state - cart state
+        const cart = sessionStorage.getItem('cart') || undefined;   
+        setCart(cart && JSON.parse(cart));
+
 
         // hasLogin -> redirect
         if(location.pathname === '/signin' && userInfo) {
@@ -61,6 +68,11 @@ export const routerConfig:Array<IRouterConfig> = [
         path: '/signup',
         exact: true,
         component: Signup
+    },
+    {
+        path: '/cart',
+        exact: true,
+        component: Cart
     },
     {
         render: (routeProps) => <p style={{color: 'red'}}>{JSON.stringify(routeProps)} : 404</p>

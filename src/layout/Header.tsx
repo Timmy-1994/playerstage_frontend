@@ -1,65 +1,82 @@
 import React from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useHistory, useLocation } from 'react-router-dom';
 // reactstrap components
 import {
-    NavbarBrand,
+    // NavbarBrand,
     Navbar,
-    Container
+    Container,
+    Button as ReactstrapButton
 } from 'reactstrap';
 import styled from 'styled-components';
 import {logo} from 'src/assets';
 
-import { Button, Menu, Dropdown, Badge, Avatar, Space, Divider } from 'antd';
+import { Button, Menu, Dropdown, Badge, Avatar, Space, Divider, Row, Col } from 'antd';
 import { useStore as useGlobalStore } from 'src/contexts/globalContext';
 import { logout } from 'src/api';
 
-const NavbarStyled = styled(Navbar)`  
+const NavbarStyled = styled(Navbar)`
   & {
     position: absolute;
     background: rgba(0,0,0,${props => props.opacity});
     color: var(--color-text-primary);
-    height: 4rem;
+    height: auto;
+    padding: 1rem 0;
+    .ant-btn {
+        color: var(--color-text-primary);
+    }
+    .ant-badge-count{
+        background:var(--color-error);
+        box-shadow: none;
+    }
+    .ant-scroll-number-only-unit.current {
+        color:var(--color-text-primary);
+        font-weight: bolder;
+    }
   }
 `;
-const ButtonStyled = styled(Button)`
-  & {
-    color: var(--color-text-primary);
-  }
+
+const MenuInCartStyled = styled(Menu)`
+    background :var(--color-background-secondary);
+    text-align: right;
+    .ant-dropdown-menu-item {
+        color:var(--color-text-primary);
+        padding: 0.5rem;
+        border-radius: 1rem;
+        &:hover {
+            background: var(--color-background-primary);
+        }
+    }
+    padding: 0.5rem;
+    border-radius: 1rem;
 `;
+
 export default function Header() {
 
     const history = useHistory();
-    const {userInfo} = useGlobalStore();
+    const location = useLocation();
+
+    const {userInfo, cart} = useGlobalStore();
 
     return (
         <NavbarStyled opacity={0.5}>
             <Container>
-                <div style={{display: 'flex', alignItems: 'center'}}>
+                <Link to="/" style={{display: 'flex', alignItems: 'center', color: 'var(--color-text-primary)'}}>
                     <img src={logo} alt="" style={{width: '1.8rem', height: '1.8rem', marginRight: '1rem' }}/>
-                    <NavbarBrand to="/" tag={Link}>
-            玩家殿堂 | playerStage
-                    </NavbarBrand>
-                </div>
-
-                <Space style={{ float: 'right' }} split={<Divider style={{borderColor: 'white'}} type="vertical" />}>
-                    <Badge count={1} size="small" showZero>
-                        <ButtonStyled type='link'>
-                            <i className="fas fa-shopping-cart"></i>
-                        </ButtonStyled>
-                    </Badge>
-
+                    玩家殿堂 | playerStage
+                </Link>
+                <Space style={{ float: 'right' }} split={<Divider style={{borderColor: 'white'}} type="vertical"/>}>
                     {
-                        userInfo 
-                            ? 
+                        userInfo
+                            ?
                             <Dropdown
                                 overlay={
                                     <Menu>
-                                        <Menu.Item 
+                                        <Menu.Item
                                             key="dashboard"
                                             onClick={() => history.push('/dashboard')}
                                         >dashboard</Menu.Item>
-                                        <Menu.Item 
-                                            key="logout" 
+                                        <Menu.Item
+                                            key="logout"
                                             onClick={() => logout(userInfo.uuid)}
                                         >logout</Menu.Item>
                                     </Menu>
@@ -71,13 +88,50 @@ export default function Header() {
                                 </Space>
                             </Dropdown>
                             :
-                            <ButtonStyled type='link' onClick={() => history.push('/signin')}>
+                            <Button type='link' onClick={() => history.push('/signin')}>
                             Sign In
-                            </ButtonStyled> 
+                            </Button>
                     }
-          
+                    {
+                        (location.pathname !== '/cart') && (
+                            <Dropdown
+                                disabled={!cart.length}
+                                trigger={['hover']}
+                                overlay={
+                                    <MenuInCartStyled>
+                                        {
+                                            cart.map(product => (
+                                                <Menu.Item key={product.uuid} onClick={() => {console.log('redirect to the product detail', product.uuid );}}>
+                                                    <Row align={'middle'} justify={'space-between'}>
+                                                        <Col>
+                                                            <img src={product.coverImage} style={{height: '50px', width: '50px'}}/>
+                                                            {product.name}
+                                                        </Col>
+                                                        <Col>
+                                                            <strong style={{marginLeft: '1rem', color: 'var(--color-error)'}}>{product.priceRangeOfModels}</strong>
+                                                            <span style={{marginLeft: '1rem'}}>X{product.amount}</span>
+                                                        </Col>
+                                                    </Row>
+                                                </Menu.Item>
+                                            ))
+                                        }
+                                        <Row justify={'end'}>
+                                            <Col>
+                                                <ReactstrapButton color="primary" size="sm" onClick={() => history.push('/cart')}>Checkout my Cart</ReactstrapButton>
+                                            </Col>
+                                        </Row>
+                                    </MenuInCartStyled>
+                                }
+                            >
+                                <Badge count={cart.length} size="small" offset={[-5, 4]}>
+                                    <Button type='link' onClick={() => history.push('/cart')} title="cart">
+                                        <i className="fas fa-shopping-cart"></i>
+                                    </Button>
+                                </Badge>
+                            </Dropdown>
+                        )
+                    }
                 </Space>
-
             </Container>
         </NavbarStyled>
     );
