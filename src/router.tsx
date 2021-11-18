@@ -18,14 +18,14 @@ export const GuardedRoute = (props:RouteProps) => {
     console.log('[ GuardedRoute - props ]', props);
 
     React.useEffect(() => {
-        
+
         // sync storage to state - user state
-        const userInfo = localStorage.getItem('userInfo') || undefined;   
-        setUserInfo(userInfo && JSON.parse(userInfo));
+        const userInfo = localStorage.getItem('userInfo');
+        userInfo !== null && setUserInfo(JSON.parse(userInfo));
         
         // sync storage to state - cart state
-        const cart = sessionStorage.getItem('cart') || undefined;   
-        setCart(cart && JSON.parse(cart));
+        const cart = sessionStorage.getItem('cart');
+        cart !== null &&  setCart(JSON.parse(cart));
 
 
         // hasLogin -> redirect
