@@ -30,7 +30,7 @@ svg
 #root
 	height: 100%
 
-// antd overrides
+// antd "global" overrides
 
 .ant-tooltip
 	.ant-tooltip-content
@@ -46,3 +46,15 @@ svg
 .ant-modal
 	.ant-modal-content
 		border-radius: .5rem
+
+.ant-image-preview-root
+	.ant-image-preview-operations
+		background-color: rgba(0, 0, 0, 0.95)
+	.ant-image-preview-mask
+		background-color: rgba(0, 0, 0, 0.85)
+	.ant-image-preview-operations-operation
+		&:nth-last-of-type(1),&:nth-last-of-type(2)
+			display: none
+
+.ant-typography
+	color: var(--color-text-primary-contrast)

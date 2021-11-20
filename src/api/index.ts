@@ -2,7 +2,7 @@
  * @see https://www.rfc-editor.org/rfc/rfc6750
  */
 
-import Axios from 'axios';
+import Axios, { AxiosResponse } from 'axios';
 import * as apiType from 'src/types/api';
 import { ResponseInterceptors } from 'src/utility/responseInterceptors';
 
@@ -65,7 +65,16 @@ export const logout = async (userUUID:string) => {
     window.location.reload();
 };
 
-export const product = {
-    get: (params?:Partial<{page:number, pageSize:number}>) => axiosIns.get<Array<apiType.IProductResponse>>('/products', {params})
-    // post:()=>axiosIns.post<apiType.ISigninResponse>("/product")
-};
+export class product {
+    
+    
+    static get(params?:Partial<{page:number, pageSize:number}>):Promise<AxiosResponse<Array<apiType.IProductResponse>>>
+    static get(params:string):Promise<AxiosResponse<apiType.IProductResponse>>
+    static get(params:any) {
+        if(typeof params ===  'string') {
+            return axiosIns.get<apiType.IProductResponse>(`/products/${params}`);
+        }
+        return axiosIns.get<Array<apiType.IProductResponse>>('/products', {params});
+    }
+
+}

@@ -38,6 +38,7 @@ module.exports = {
         'no-unreachable': 'error',
         'computed-property-spacing': ['error', 'never'],
         'curly': ['error', 'all'],
-        'no-unneeded-ternary': 'error'
+        'no-unneeded-ternary': 'error',
+        'no-dupe-class-members': 'off'
     }
 };
