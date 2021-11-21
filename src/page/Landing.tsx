@@ -16,6 +16,7 @@ import { ICartItem, useStore } from 'src/contexts/globalContext';
 import { Button, Container } from 'reactstrap';
 import { Modal } from 'src/layout/Modals';
 import Paragraph from 'antd/lib/typography/Paragraph';
+import { useHistory } from 'react-router-dom';
 
 const {
     // Panel,
@@ -120,7 +121,7 @@ const CardStyled = styled(Card)`
     }
 `;
 
-const RateStyled = styled(Rate)`
+export const RateStyled = styled(Rate)`
     & {
         .ant-rate-star {
             margin:0;
@@ -151,7 +152,8 @@ export default function Landing() {
     const [ isOutOfProduct, setIsOutOfProduct ] = useState(false);
     const [ isScrolledEnd, setIsScrolledEnd ] = useState(false);
     const { setCart } = useStore();
-
+    const history = useHistory();
+    
     const getProductList = async (_page:number = 0) => {
         try{
             setIsLoading(true);
@@ -225,9 +227,7 @@ export default function Landing() {
 
     const renderCard = (product:apiType.IProductResponse) => (
         <CardStyled
-            onClick={() => {
-                console.log('driect to detail page');
-            }}
+            onClick={() => history.push(`/product/${product.uuid}`)}
         >
             <div style={{margin: '-1rem -1rem 1rem -1rem'}}>
                 <Image

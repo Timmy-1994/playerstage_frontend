@@ -122,7 +122,13 @@ export default function Cart() {
                     />
                 </Col>
                 <Col span={12}>
-                    <Row wrap={false} align={'middle'} gutter={[15, 0]}>
+                    <Row 
+                        wrap={false} 
+                        align={'middle'} 
+                        gutter={[15, 0]} 
+                        style={{cursor: 'pointer'}}
+                        onClick={() => history.push(`/product/${item.uuid}`)}
+                    >
                         <Col flex={'0 0 95px'}><img src={item.coverImage}/></Col>
                         <Col>{item.name}</Col>
                     </Row>

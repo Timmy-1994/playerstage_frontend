@@ -47,7 +47,7 @@ export type ISignupResponse = {
     utime:                 null;
 }
 
-interface IProductModel {
+export interface IProductModel {
     uuid:         string;
     name:         string;
     price:        number;

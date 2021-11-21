@@ -101,7 +101,11 @@ export default function Header() {
                                     <MenuInCartStyled>
                                         {
                                             cart.map(product => (
-                                                <Menu.Item key={product.uuid} onClick={() => {console.log('redirect to the product detail', product.uuid );}}>
+                                                <Menu.Item 
+                                                    key={product.uuid} 
+                                                    style={{cursor: 'pointer'}}
+                                                    onClick={() => history.push(`/product/${product.uuid}`)}
+                                                >
                                                     <Row align={'middle'} justify={'space-between'}>
                                                         <Col>
                                                             <img src={product.coverImage} style={{height: '50px', width: '50px'}}/>
