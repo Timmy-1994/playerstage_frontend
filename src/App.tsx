@@ -4,7 +4,7 @@ import { routerConfig, GuardedRoutes } from 'src/router';
 import { IntlProvider } from 'react-intl';
 import { twLang } from './assets/i18n/tw';
 import { enLang } from './assets/i18n/en';
-
+import { Provider as CartProvider }  from 'src/contexts/cartContext';
 export default function App() {
     
     const lang = localStorage.getItem('lang') || navigator.language;
@@ -13,7 +13,9 @@ export default function App() {
     return (
         <IntlProvider locale={lang} key={lang} messages={messages} defaultLocale='tw'>
             <GlobalProvider>
-                <GuardedRoutes config={routerConfig}/>
+                <CartProvider>
+                    <GuardedRoutes config={routerConfig}/>
+                </CartProvider>
             </GlobalProvider>
         </IntlProvider>
     );

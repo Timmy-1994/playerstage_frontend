@@ -12,6 +12,7 @@ import {logo} from 'src/assets';
 
 import { Button, Menu, Dropdown, Badge, Avatar, Space, Divider, Row, Col } from 'antd';
 import { useStore as useGlobalStore } from 'src/contexts/globalContext';
+import { useStore as useCartStore } from 'src/contexts/cartContext';
 import { logout } from 'src/api';
 
 const NavbarStyled = styled(Navbar)`
@@ -55,7 +56,8 @@ export default function Header() {
     const history = useHistory();
     const location = useLocation();
 
-    const {userInfo, cart} = useGlobalStore();
+    const {userInfo} = useGlobalStore();
+    const {cart} = useCartStore();
 
     return (
         <NavbarStyled opacity={0.5}>
@@ -102,7 +104,7 @@ export default function Header() {
                                         {
                                             cart.map(product => (
                                                 <Menu.Item 
-                                                    key={product.uuid} 
+                                                    key={`${product.uuid}-${product.selectedModelUUID}`} 
                                                     style={{cursor: 'pointer'}}
                                                     onClick={() => history.push(`/product/${product.uuid}`)}
                                                 >
@@ -112,7 +114,11 @@ export default function Header() {
                                                             {product.name}
                                                         </Col>
                                                         <Col>
-                                                            <strong style={{marginLeft: '1rem', color: 'var(--color-error)'}}>{product.priceRangeOfModels}</strong>
+                                                            <strong style={{marginLeft: '1rem', color: 'var(--color-error)'}}>
+                                                                {
+                                                                    product.models.find(x => x.uuid === product.selectedModelUUID)?.price ?? '-'
+                                                                }
+                                                            </strong>
                                                             <span style={{marginLeft: '1rem'}}>X{product.amount}</span>
                                                         </Col>
                                                     </Row>

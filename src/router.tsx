@@ -4,6 +4,7 @@ import Signin from 'src/page/Signin';
 import Signup from 'src/page/Signup';
 import Landing from 'src/page/Landing';
 import { useStore as useGlobalStore } from 'src/contexts/globalContext';
+import { ICartItem, useStore as useCartStore } from 'src/contexts/cartContext';
 import Cart from './page/Cart';
 import Product from './page/Product';
 
@@ -13,10 +14,11 @@ export interface IRouterConfig extends RouteProps {
 }
 export const GuardedRoute = (props:RouteProps) => {
     const location = useLocation();
-    const {setUserInfo, setCart} = useGlobalStore();
+    const {setUserInfo} = useGlobalStore();
+    const {dispatchCart} = useCartStore();
     const history = useHistory();
 
-    console.log('[ GuardedRoute - props ]', props);
+    // console.log('[ GuardedRoute - props ]', props);
 
     React.useEffect(() => {
 
@@ -26,8 +28,10 @@ export const GuardedRoute = (props:RouteProps) => {
         
         // sync storage to state - cart state
         const cart = sessionStorage.getItem('cart');
-        cart !== null &&  setCart(JSON.parse(cart));
-
+        if(cart !== null) {
+            const cartItems:Array<ICartItem> = JSON.parse(cart);
+            cartItems.forEach(item => dispatchCart({type: 'POST_ITEM', payload: item}));
+        }
 
         // hasLogin -> redirect
         if(location.pathname === '/signin' && userInfo) {

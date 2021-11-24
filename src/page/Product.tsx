@@ -12,11 +12,13 @@ import {
     Radio
 } from 'antd';
 import { useStore } from 'src/contexts/globalContext';
+import { useStore as useCartStore } from 'src/contexts/cartContext';
 import { Button, Container } from 'reactstrap';
 import { Modal } from 'src/layout/Modals';
 import { useHistory, useParams } from 'react-router-dom';
-import { getPriceRangeFromModels, RateStyled } from './Landing';
+import { RateStyled } from './Landing';
 import InputNumber from 'src/component/InputNumber';
+import { getPriceRangeFromModels } from 'src/utility';
 
 const {
     // Panel,
@@ -71,7 +73,9 @@ const ImageWrapper = styled.div`
 
 export default function Product() {
     const history = useHistory();
-    const { setIsLoading, setCart } = useStore();
+    const { setIsLoading } = useStore();
+    
+    const { dispatchCart } = useCartStore();
 
     const { uuid } = useParams<{uuid:string}>();
     const [ detail, setDetailState ] = React.useState<apiType.IProductResponse|undefined>();
@@ -93,7 +97,7 @@ export default function Product() {
                 setIsLoading(false);
             }
         })();
-    }, []);
+    }, [uuid]);
 
     React.useEffect(() => {
         if(!detail) {
@@ -102,40 +106,6 @@ export default function Product() {
         // defautl select first one
         setSelectedModel(detail.models[0]);
     }, [detail]);
-
-    const onAddToCart = (detail:apiType.IProductResponse, selectedModel:apiType.IProductModel) => {
-        setCart(prvCart => {
-
-            const ptr = prvCart.find(x => x.uuid === detail.uuid);
-        
-            if(ptr) {
-                ptr.amount += 1;
-                return [...prvCart];
-            }
-
-            return [
-                ...prvCart,
-                {
-                    ...detail,
-                    amount,
-                    priceRangeOfModels: getPriceRangeFromModels(detail.models), 
-                    noModelsForSelect: detail.models.length <= 1,
-                    selectedModelUUID: selectedModel.uuid,
-                    isChecked: true
-                }
-            ];
-        });
-
-        
-        Modal.success({
-            content: 'Added to cart',
-            maskClosable: true,
-            width: '200px',
-            direction: 'vertical',
-            footer: null,
-            duration: 1000
-        });
-    };
 
     return (
         <Layout>
@@ -232,7 +202,24 @@ export default function Product() {
                                         color="info"
                                         size="lg"
                                         disabled={!selectedModel || !amount}
-                                        onClick={() => detail && selectedModel && onAddToCart(detail, selectedModel)}
+                                        onClick={() => {
+                                            if(!detail || !selectedModel) {
+                                                throw(new Error('detail & selectedModel are required'));
+                                            }
+                                            dispatchCart({
+                                                type: 'POST_ITEM',
+                                                payload: {...detail, selectedModelUUID: selectedModel.uuid}
+                                            });
+                                            
+                                            Modal.success({
+                                                content: 'Added to cart',
+                                                maskClosable: true,
+                                                width: '200px',
+                                                direction: 'vertical',
+                                                footer: null,
+                                                duration: 1000
+                                            });
+                                        }}
                                     >Add to my cart</Button>
                                     <Button
                                         className="btn-round"
