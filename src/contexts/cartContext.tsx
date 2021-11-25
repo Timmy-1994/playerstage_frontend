@@ -14,8 +14,9 @@ export interface ICartItem extends ResponseType.IProductResponse{
 
 type action = (
     {type: 'POST_ITEM', payload:Partial<ICartItem>}|
-    {type: 'DELETE_ITEM', uuid?:string}|
-    {type: 'PUT_ITEM', payload:Partial<ICartItem>}
+    {type: 'DELETE_ITEM', payload:{modelUUID:string}}|
+    {type: 'PUT_ITEM', payload:{modelUUID:string, data:Partial<ICartItem>}}|
+    {type: 'DELETE_ALL_ITEM'}
 )
 
 interface IContext {
@@ -66,16 +67,25 @@ export const useStore = () => useContext(Context);
 
 export const Provider = (props: IProvider) => {
 
-    const putItem = (prvState:ICartItem[], payload:Partial<ICartItem>) => {
+    const putItem = (prvState:ICartItem[], payload:{modelUUID:string, data:Partial<ICartItem>}) => {
         
         let newState:ICartItem[] = [];
         
+
         for (const item of prvState) {
-            if(item.uuid === payload.uuid) {
-                newState.push({...item, ...payload}); 
-            }else{
+
+            if(item.selectedModelUUID !== payload.modelUUID) {
                 newState.push(item);
+                continue;
             }
+            
+            // make sure amount under total stock
+            const model = item.models.find(x => x.uuid === payload.data.selectedModelUUID);
+            if(Number(payload.data?.amount) > Number(model?.totalStock)) {
+                payload.data.amount = model?.totalStock;
+            }
+
+            newState.push({...item, ...payload.data}); 
         }
 
         return newState;
@@ -88,12 +98,20 @@ export const Provider = (props: IProvider) => {
         let exsistSameModel = false;
 
         for (const item of prvState) {
-            if(item.selectedModelUUID === payload.selectedModelUUID) {
-                newState.push({...item, amount: item.amount + 1});
-                exsistSameModel = true;
-            }else{
+            if(item.selectedModelUUID !== payload.selectedModelUUID) {
                 newState.push(item);
+                continue;
             }
+
+            // make sure amount under total stock
+            const model = item.models.find(x => x.uuid === payload.selectedModelUUID);
+            let amount = item.amount;
+            if(model && (item.amount + 1 <= model.totalStock)) {
+                amount += 1;
+            }
+
+            newState.push({...item, amount});
+            exsistSameModel = true;
         }
 
         if(exsistSameModel) {
@@ -103,7 +121,7 @@ export const Provider = (props: IProvider) => {
         return [...prvState, payload];
     };
 
-    const [cart, dispatchCart] = useReducer<React.Reducer<Array<ICartItem>, action>, Array<ICartItem>>(
+    const [cart, dispatchCart] = useReducer<React.Reducer<Array<ICartItem>, action>>(
         (state, action) => {
             switch(action.type) {
                 case 'PUT_ITEM':
@@ -111,19 +129,14 @@ export const Provider = (props: IProvider) => {
                 case 'POST_ITEM':
                     return postItem(state, buildACartItem(action.payload));
                 case 'DELETE_ITEM':
-                    if(action.uuid === undefined) {
-                        return [];
-                    }
-                    return [...state.filter(x => x.uuid !== action.uuid)];
+                    return [...state.filter(x => x.selectedModelUUID !== action.payload.modelUUID)];
+                case 'DELETE_ALL_ITEM':
+                    return [];
                 default:
                     return state;
             }
         },
-        [], // init state
-        state => {
-            console.log('useReducer 3Arg lazy init ?', state);
-            return state;
-        }
+        []
     );
 
     React.useEffect(() => {

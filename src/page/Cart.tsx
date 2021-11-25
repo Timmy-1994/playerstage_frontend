@@ -51,11 +51,11 @@ export default function Cart() {
     const isAllChecked = cart.every(x => x.isChecked);
     const isPartialChecked = !isAllChecked && cart.some(x => x.isChecked);
 
-    const onCartItemDelete = (uuid:string) => {
+    const onCartItemDelete = (modelUUID:string) => {
         Modal.warning({
             content: 'are u sure to delete ?',
             onOk: () => {
-                dispatchCart({type: 'DELETE_ITEM', uuid});
+                dispatchCart({type: 'DELETE_ITEM', payload: {modelUUID}});
             },
             okText: 'yes, delete it',
             cancelText: 'cancel'
@@ -72,19 +72,26 @@ export default function Cart() {
         }
 
         const ptr = cart.find(x => x === i);
-        ptr && dispatchCart({type: 'PUT_ITEM', payload: {...ptr, amount: ptr.amount + 1} });
+        ptr && dispatchCart({type: 'PUT_ITEM', payload: {
+            modelUUID: ptr.selectedModelUUID,
+            data: {...ptr, amount: ptr.amount + 1}
+        } });
 
     
     };
     const onCartItemAmountMinus = (i:ICartItem) => {
         // console.log("before onCartItemAmountMinus" , i.amount)
         if(i.amount - 1 === 0) {
-            onCartItemDelete(i.uuid);
+            onCartItemDelete(i.selectedModelUUID);
             return;
         }
         
         const ptr = cart.find(x => x === i);
-        ptr && dispatchCart({type: 'PUT_ITEM', payload: {...ptr, amount: ptr.amount - 1} });
+        ptr && dispatchCart({type: 'PUT_ITEM', payload: {
+            modelUUID: ptr.selectedModelUUID,
+            data: {...ptr, amount: ptr.amount - 1}
+        } });
+
 
     };
     // const onCartItemAmountChange = (e:React.ChangeEvent<HTMLInputElement>)=>{}
@@ -104,7 +111,10 @@ export default function Cart() {
                         checked={item.isChecked}
                         onClick={() => {
                             const ptr = cart.find(x => x === item);
-                            ptr && dispatchCart({type: 'PUT_ITEM', payload: {...ptr, isChecked: !ptr.isChecked} });
+                            ptr && dispatchCart({type: 'PUT_ITEM', payload: {
+                                modelUUID: ptr.selectedModelUUID,
+                                data: {...ptr, isChecked: !ptr.isChecked}
+                            } });
                         }}
                     />
                 </Col>
@@ -128,7 +138,10 @@ export default function Cart() {
                                 value={item.selectedModelUUID} 
                                 style={{width: '100%'}} 
                                 onSelect={selectedModelUUID => {
-                                    dispatchCart({type: 'PUT_ITEM', payload: {...item, selectedModelUUID}});
+                                    dispatchCart({type: 'PUT_ITEM', payload: {
+                                        modelUUID: item.selectedModelUUID,
+                                        data: {...item, selectedModelUUID}
+                                    }});
                                 }}
                             >
                                 {
@@ -136,6 +149,7 @@ export default function Cart() {
                                         <Select.Option
                                             key={m.uuid}
                                             value={m.uuid}
+                                            disabled={m.totalStock === 0 || Boolean(cart.find(x => x.selectedModelUUID === m.uuid))}
                                         >{m.name}</Select.Option>
                                     ))
                                 }
@@ -158,7 +172,7 @@ export default function Cart() {
                     </big>
                 </Col>
                 <Col span={2} style={{textAlign: 'center'}}>
-                    <a onClick={() => onCartItemDelete(item.uuid)}>
+                    <a onClick={() => onCartItemDelete(item.selectedModelUUID)}>
                         <DeleteOutlined/> delete
                     </a>
                 </Col>
@@ -185,7 +199,10 @@ export default function Cart() {
                                     checked={isAllChecked}
                                     onClick={() => {
                                         cart.forEach((item) => {
-                                            dispatchCart({type: 'PUT_ITEM', payload: {...item, isChecked: !isAllChecked} });
+                                            dispatchCart({type: 'PUT_ITEM', payload: {
+                                                modelUUID: item.uuid,
+                                                data: {...item, isChecked: !isAllChecked}
+                                            }});
                                         });
                                     }}
                                 >

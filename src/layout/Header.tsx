@@ -57,7 +57,7 @@ export default function Header() {
     const location = useLocation();
 
     const {userInfo} = useGlobalStore();
-    const {cart} = useCartStore();
+    const {cart, dispatchCart} = useCartStore();
 
     return (
         <NavbarStyled opacity={0.5}>
@@ -97,41 +97,49 @@ export default function Header() {
                     {
                         (location.pathname !== '/cart') && (
                             <Dropdown
-                                disabled={!cart.length}
+                                disabled={cart.length === 0}
                                 trigger={['hover']}
-                                overlay={
-                                    <MenuInCartStyled>
-                                        {
-                                            cart.map(product => (
-                                                <Menu.Item 
-                                                    key={`${product.uuid}-${product.selectedModelUUID}`} 
-                                                    style={{cursor: 'pointer'}}
-                                                    onClick={() => history.push(`/product/${product.uuid}`)}
-                                                >
-                                                    <Row align={'middle'} justify={'space-between'}>
-                                                        <Col>
-                                                            <img src={product.coverImage} style={{height: '50px', width: '50px'}}/>
-                                                            {product.name}
-                                                        </Col>
-                                                        <Col>
-                                                            <strong style={{marginLeft: '1rem', color: 'var(--color-error)'}}>
-                                                                {
-                                                                    product.models.find(x => x.uuid === product.selectedModelUUID)?.price ?? '-'
-                                                                }
-                                                            </strong>
-                                                            <span style={{marginLeft: '1rem'}}>X{product.amount}</span>
-                                                        </Col>
-                                                    </Row>
-                                                </Menu.Item>
-                                            ))
-                                        }
-                                        <Row justify={'end'}>
-                                            <Col>
-                                                <ReactstrapButton color="primary" size="sm" onClick={() => history.push('/cart')}>Checkout my Cart</ReactstrapButton>
-                                            </Col>
-                                        </Row>
-                                    </MenuInCartStyled>
-                                }
+                                overlay={() => {
+                                    if(cart.length === 0) {
+                                        return <></>;
+                                    }
+                                    return (
+                                        <MenuInCartStyled>
+                                            {
+                                                cart.map(product => (
+                                                    <Menu.Item 
+                                                        key={`${product.uuid}-${product.selectedModelUUID}`} 
+                                                        style={{cursor: 'pointer'}}
+                                                        onClick={() => history.push(`/product/${product.uuid}`)}
+                                                    >
+                                                        <Row align={'middle'} justify={'space-between'}>
+                                                            <Col>
+                                                                <img src={product.coverImage} style={{height: '50px', width: '50px'}}/>
+                                                                {product.name}
+                                                            </Col>
+                                                            <Col>
+                                                                <strong style={{marginLeft: '1rem', color: 'var(--color-error)'}}>
+                                                                    {
+                                                                        product.models.find(x => x.uuid === product.selectedModelUUID)?.price ?? '-'
+                                                                    }
+                                                                </strong>
+                                                                <span style={{marginLeft: '1rem'}}>X{product.amount}</span>
+                                                            </Col>
+                                                        </Row>
+                                                    </Menu.Item>
+                                                ))
+                                            }
+                                            <Row justify={'end'} gutter={12}>
+                                                <Col>
+                                                    <ReactstrapButton size="sm" onClick={() => dispatchCart({type: 'DELETE_ALL_ITEM'})}>Empty my Cart</ReactstrapButton>
+                                                </Col>
+                                                <Col>
+                                                    <ReactstrapButton color="primary" size="sm" onClick={() => history.push('/cart')}>Checkout my Cart</ReactstrapButton>
+                                                </Col>
+                                            </Row>
+                                        </MenuInCartStyled>
+                                    );
+                                }}
                             >
                                 <Badge count={cart.length} size="small" offset={[-5, 4]}>
                                     <Button type='link' onClick={() => history.push('/cart')} title="cart">
