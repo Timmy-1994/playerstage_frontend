@@ -7,6 +7,7 @@ import { useStore as useGlobalStore } from 'src/contexts/globalContext';
 import { ICartItem, useStore as useCartStore } from 'src/contexts/cartContext';
 import Cart from './page/Cart';
 import Product from './page/Product';
+import Checkout from './page/Checkout';
 
 export interface IRouterConfig extends RouteProps {
 	component?:React.ComponentType<any>,
@@ -83,6 +84,11 @@ export const routerConfig:Array<IRouterConfig> = [
         path: '/product/:uuid',
         exact: true,
         component: Product
+    },
+    {
+        path: '/checkout',
+        exact: true,
+        component: Checkout
     },
     {
         render: (routeProps) => <p style={{color: 'red'}}>{JSON.stringify(routeProps)} : 404</p>

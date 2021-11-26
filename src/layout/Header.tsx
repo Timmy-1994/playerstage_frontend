@@ -95,7 +95,7 @@ export default function Header() {
                             </Button>
                     }
                     {
-                        (location.pathname !== '/cart') && (
+                        (!/\/cart|\/checkout/g.test(location.pathname)) && (
                             <Dropdown
                                 disabled={cart.length === 0}
                                 trigger={['hover']}
