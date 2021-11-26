@@ -225,6 +225,7 @@ export default function Product() {
                                         className="btn-round"
                                         color="primary"
                                         size="lg"
+                                        onClick={() => history.push(`/checkout?p=${detail?.uuid}&a=${amount}&s=${selectedModel?.uuid}`)}
                                     >Chekout Right Now</Button>
                                 </Space>
                             </Row>

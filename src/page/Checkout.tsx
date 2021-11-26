@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Layout from 'src/layout/default';
 // import {Modal} from 'src/layout/Modals';
 import styled from 'styled-components';
@@ -11,6 +11,9 @@ import { Row, Col, Input, Typography } from 'antd';
 import { ICartItem, useStore as useCartStore } from 'src/contexts/cartContext';
 import { useHistory } from 'react-router';
 import { geSelectModelFromCartItem } from './Cart';
+import { useLocation } from 'react-router-dom';
+import { useStore } from 'src/contexts/globalContext';
+import * as api from 'src/api';
 
 
 const [ImgNameColSpan, ModelColSpan, SinglePriceColSpan, amountColSpan, TotalPriceColSpan] = [12, 4, 3, 2, 3];
@@ -25,11 +28,43 @@ const TypographyStyled = styled(Typography)`
 export default function Checkout() {
     const history = useHistory();
     const { cart } = useCartStore();
+    const { setIsLoading } = useStore();
+    const [checkoutItems, setCheckoutItems] = useState<Array<ICartItem>>([]);
+    
+    const {search} = useLocation();
+    React.useEffect(() => {
+        
+        const qs = new URLSearchParams(search);
+        
+        const productID = qs.get('p');
+        const amount = qs.get('a');
+        const selectModelID = qs.get('s');
 
-    const checkoutItemsInCart = cart.filter(x => x.isChecked);
-    
-    console.log('[ checkoutItemsInCart ]', checkoutItemsInCart);
-    
+        console.log('[ loc ]', {productID, amount, selectModelID});
+        if(productID === null || amount === null || selectModelID === null) {
+            setCheckoutItems(cart.filter(x => x.isChecked)); 
+            return;
+        }
+
+        (async () => {
+            try{
+                setIsLoading(true);
+                const {data} = await api.product.get(productID);
+                setCheckoutItems([{...data,
+                    amount: Number(amount),
+                    selectedModelUUID: selectModelID,
+                    noModelsForSelect: false, 
+                    isChecked: false
+                }]);
+            }catch(e) {
+                console.error(e);
+                history.goBack();
+            }finally{
+                setIsLoading(false);
+            }
+        })();
+
+    }, [search]);
 
     const renderCheckoutCartItem = (item:ICartItem) => {
 
@@ -94,7 +129,7 @@ export default function Checkout() {
                             <Col style={{textAlign: 'center'}} span={TotalPriceColSpan}>total price</Col>
                         </Row>
 
-                        { cart.map(i => renderCheckoutCartItem(i)) }
+                        { checkoutItems.map(i => renderCheckoutCartItem(i)) }
 
                         <Row className="mt-5" gutter={24} >
                             <Col span={12}>
